@@ -38,7 +38,7 @@ data_sources = {
     },
     "Kota Cirebon": {
         "file": "DataKotaCirebon.csv",
-        "gdrive": "https://drive.google.com/file/d/19ae9zMmGu8xc79VPCK9mPVXTkUu27tJI/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/19ae9zMmGu8xc79VPCK9mPVXTkUu27tJI/view?usp=sharing",
         "tambahan": {
             "Statistik": "https://drive.google.com/file/d/1P4b0DQuK2WeD9B8tWAWuss-Z1xoC0CEz/view?usp=sharing",
             "Distribusi": "https://drive.google.com/file/d/1vByf56GEQZ7W6eZdXh602MXWd7xVZlNh/view?usp=sharing"
