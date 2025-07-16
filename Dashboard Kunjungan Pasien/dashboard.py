@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Nama file Excel
-file_excel = "Simulasi kunjungan pasien rawat inap per asal wilayah.xlsx"
+file_excel = "Data Kunjungan Pasien.csv"
 
 # Daftar sheet dan header row
 sheet_headers = {
