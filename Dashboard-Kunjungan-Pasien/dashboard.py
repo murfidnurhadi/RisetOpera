@@ -8,9 +8,9 @@ st.set_page_config(page_title="Dashboard Simulasi Monte Carlo", layout="wide")
 st.title("📊 Dashboard Simulasi Monte Carlo")
 
 # Sidebar menu navigasi
-st.image("https://github.com/murfidnurhadi/simulasi_monte_carlo/tree/main/Dashboard-Kunjungan-Pasien/images/unikom.png", width=150)
-st.image("https://github.com/murfidnurhadi/simulasi_monte_carlo/tree/main/Dashboard-Kunjungan-Pasien/images/kelompok6.png", width=450)
 st.sidebar.header("Menu Navigasi")
+st.image("https://raw.githubusercontent.com/murfidnurhadi/simulasi_monte_carlo/main/Dashboard-Kunjungan-Pasien/images/unikom.png", width=150)
+st.image("https://raw.githubusercontent.com/murfidnurhadi/simulasi_monte_carlo/main/Dashboard-Kunjungan-Pasien/images/kelompok6.png", width=450)
 menu = st.sidebar.radio("Pilih Dataset:", [
     "Data Kunjungan Pasien",
     "Data Train",
