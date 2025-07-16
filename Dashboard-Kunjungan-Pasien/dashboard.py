@@ -91,13 +91,12 @@ def load_data(local_path, gdrive_url):
             st.info(f"📥 Mengunduh {os.path.basename(local_path)} dari Google Drive...")
             gdown.download(convert_gdrive_link(gdrive_url), local_path, quiet=False)
 
-        # Coba baca dengan UTF-8 dulu
         try:
             df = pd.read_csv(local_path, low_memory=False)
         except UnicodeDecodeError:
             df = pd.read_csv(local_path, encoding="ISO-8859-1", low_memory=False)
 
-        if df.shape[1] == 1:  # jika delimiter salah
+        if df.shape[1] == 1:  # delimiter salah
             try:
                 df = pd.read_csv(local_path, delimiter=";", encoding="utf-8", low_memory=False)
             except UnicodeDecodeError:
@@ -142,9 +141,21 @@ else:
             st.warning("⚠ Tidak ada data untuk ditampilkan.")
             continue
 
-        # Tampilkan Data
+        # ✅ Tampilkan Data
         st.dataframe(df, use_container_width=True)
         st.markdown(f"**Jumlah Data:** {len(df)} baris")
+
+        # ✅ Jika Data Kunjungan Pasien → TIDAK ada filter & grafik
+        if "Data_Kunjungan_Pasien.csv" in info["file"]:
+            csv = df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Download Data (CSV)",
+                data=csv,
+                file_name=f"{info['file']}",
+                mime="text/csv",
+                key=f"download_{idx}"
+            )
+            continue
 
         # ✅ Filter Dinamis
         with st.expander("🔍 Filter Data"):
@@ -184,7 +195,7 @@ else:
             except:
                 st.warning("⚠ Tidak bisa membuat grafik. Pastikan kolom numerik untuk Y.")
 
-        # ✅ Download Button (Fix Duplicate ID)
+        # ✅ Download Button
         csv = df_filtered.to_csv(index=False).encode('utf-8')
         st.download_button(
             label="📥 Download Data (CSV)",
