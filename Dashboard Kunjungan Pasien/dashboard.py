@@ -1,86 +1,82 @@
+import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
 
-# Nama file Excel
-file_excel = "Data Kunjungan Pasien.csv"
+# Konfigurasi halaman
+st.set_page_config(layout="wide", page_title="Dashboard Kunjungan Pasien", page_icon="🏥")
 
-# Daftar sheet dan header row
-sheet_headers = {
-    'Data': 0,
-    'Data Training': 2,
-    'Probabilitas': 2,
-    'Interval': 2,
-    'RNG LCG': 2,
-    'Simulasi': 2,
-}
+# Fungsi untuk memuat data
+@st.cache_data
+def load_data():
+    file_path = "Data Kujungan Pasien.csv"  # Pastikan file ada di repo GitHub Anda
+    # Skip baris awal yang bukan data
+    df = pd.read_csv(file_path, skiprows=2)
+    
+    # Ambil kolom penting
+    df = df[["tahun", "bulan", "Angka Acak", "Kota Cirebon", "Kab. Cirebon",
+             "Kuningan", "Indramayu", "Majalengka", "Lain-lain"]]
 
-# Fungsi membaca sheet
-def baca_sheet_dengan_header(file, sheet_name, header_row=0):
-    try:
-        df = pd.read_excel(file, sheet_name=sheet_name, header=header_row)
-        df = df.dropna(how='all')  # Hapus baris yang semua kolomnya kosong
-        return df
-    except Exception as e:
-        print(f"Gagal membaca sheet '{sheet_name}': {e}")
-        return None
+    # Hilangkan baris kosong
+    df = df.dropna(subset=["tahun", "bulan"])
+    
+    # Ubah format tahun menjadi int
+    df["tahun"] = df["tahun"].astype(int)
 
-# Fungsi menampilkan grafik
-def tampilkan_grafik(df, judul=''):
-    try:
-        df_num = df.select_dtypes(include='number')
-        if df_num.empty:
-            print("Tidak ada kolom numerik untuk divisualisasikan.")
-            return
+    # Ubah ke format long agar mudah visualisasi
+    df_melted = df.melt(id_vars=["tahun", "bulan", "Angka Acak"], 
+                        var_name="Wilayah", value_name="Jumlah Pasien")
+    df_melted["Jumlah Pasien"] = pd.to_numeric(df_melted["Jumlah Pasien"], errors="coerce").fillna(0)
+    return df_melted
 
-        label_col = df.columns[0]
+# Load data
+df = load_data()
 
-        # Grafik garis
-        df.plot(x=label_col, kind='line', title=f"{judul} - Garis")
-        plt.grid()
-        plt.show()
+# Sidebar Filter
+with st.sidebar:
+    st.title("🏥 Filter Data")
+    tahun_list = sorted(df["tahun"].unique())
+    selected_tahun = st.multiselect("Pilih Tahun", tahun_list, default=tahun_list)
+    
+    wilayah_list = df["Wilayah"].unique()
+    selected_wilayah = st.multiselect("Pilih Wilayah", wilayah_list, default=wilayah_list)
 
-        # Grafik batang
-        df.plot(x=label_col, kind='bar', title=f"{judul} - Batang")
-        plt.grid()
-        plt.show()
+# Filter data sesuai pilihan
+filtered_df = df[(df["tahun"].isin(selected_tahun)) & (df["Wilayah"].isin(selected_wilayah))]
 
-        # Grafik lingkaran (pie)
-        if len(df.columns) > 2:
-            pie_data = df.drop(columns=label_col).sum(numeric_only=True)
-            pie_data.plot(kind='pie', autopct='%1.1f%%', title=f"{judul} - Pie")
-            plt.ylabel('')
-            plt.show()
-    except Exception as e:
-        print(f"Gagal menampilkan grafik: {e}")
+# Tampilan Utama
+st.title("📊 Dashboard Kunjungan Pasien Rawat Inap")
+st.markdown("### Rumah Sakit Gunung Jati - Kota Cirebon")
 
-# Fungsi menampilkan sheet dan grafik
-def tampilkan_sheet(sheet_index):
-    sheet_names = list(sheet_headers.keys())
-    if 1 <= sheet_index <= len(sheet_names):
-        sheet_name = sheet_names[sheet_index - 1]
-        df = baca_sheet_dengan_header(file_excel, sheet_name, header_row=sheet_headers[sheet_name])
-        if df is not None:
-            print(f"\n--- {sheet_name} ---\n")
-            print(df.head(12))
-            tampilkan_grafik(df, judul=sheet_name)
-    else:
-        print("Pilihan tidak valid.")
+# KPI: Total Kunjungan
+total_kunjungan = int(filtered_df["Jumlah Pasien"].sum())
+col1, col2 = st.columns(2)
+col1.metric("Total Kunjungan", f"{total_kunjungan:,}")
+col2.metric("Jumlah Wilayah", len(selected_wilayah))
 
-# Menu utama
-def menu():
-    while True:
-        print("\n=== MENU SIMULASI KUNJUNGAN PASIEN ===")
-        for i, name in enumerate(sheet_headers.keys(), 1):
-            print(f"{i}. {name}")
-        print("0. Keluar")
+# Grafik Tren per Bulan
+st.subheader("📈 Tren Kunjungan per Bulan")
+fig_trend = px.line(filtered_df, x="bulan", y="Jumlah Pasien", color="Wilayah",
+                    title="Tren Kunjungan Pasien per Wilayah",
+                    markers=True)
+st.plotly_chart(fig_trend, use_container_width=True)
 
-        pilihan = input("Pilih menu [0-6]: ")
-        if pilihan == '0':
-            print("Selesai.")
-            break
-        elif pilihan.isdigit() and 1 <= int(pilihan) <= len(sheet_headers):
-            tampilkan_sheet(int(pilihan))
-        else:
-            print("Pilihan tidak valid.")
+# Distribusi per Wilayah (Bar)
+st.subheader("📊 Distribusi Total Kunjungan per Wilayah")
+wilayah_total = filtered_df.groupby("Wilayah")["Jumlah Pasien"].sum().reset_index()
+fig_bar = px.bar(wilayah_total, x="Wilayah", y="Jumlah Pasien", color="Wilayah",
+                 title="Distribusi Kunjungan", text="Jumlah Pasien")
+st.plotly_chart(fig_bar, use_container_width=True)
 
-menu()
+# Pie Chart
+st.subheader("🍩 Proporsi Kunjungan per Wilayah")
+fig_pie = px.pie(wilayah_total, names="Wilayah", values="Jumlah Pasien",
+                 hole=0.4, title="Proporsi Kunjungan")
+st.plotly_chart(fig_pie, use_container_width=True)
+
+# Tabel Data
+st.subheader("📄 Data Detail")
+st.dataframe(filtered_df)
+
+# Footer
+st.markdown("---")
+st.markdown("📌 **Dashboard ini dibuat oleh Kelompok 6 | UNIKOM**")
