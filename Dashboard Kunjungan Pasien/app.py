@@ -5,27 +5,29 @@ import plotly.express as px
 # Konfigurasi halaman
 st.set_page_config(layout="wide", page_title="Dashboard Kunjungan Pasien", page_icon="🏥")
 
-# Fungsi untuk memuat data
+# Fungsi untuk memuat data dari Google Drive
 @st.cache_data
 def load_data():
-    file_path = "Data_Kujungan_Pasien.csv"  # Pastikan file ada di repo GitHub Anda
-    # Skip baris awal yang bukan data
-    df = pd.read_csv(file_path, skiprows=2)
-    
+    # Ganti dengan ID file Google Drive Anda
+    file_id = "1JvFs_7W0I0jdXmUNNU8-Jg3L1XOWS5_m"
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+
+    # Baca CSV dari link Google Drive
+    df = pd.read_csv(url, skiprows=2)
+
     # Ambil kolom penting
     df = df[["tahun", "bulan", "Angka Acak", "Kota Cirebon", "Kab. Cirebon",
              "Kuningan", "Indramayu", "Majalengka", "Lain-lain"]]
 
-    # Hilangkan baris kosong
+    # Bersihkan data
     df = df.dropna(subset=["tahun", "bulan"])
-    
-    # Ubah format tahun menjadi int
     df["tahun"] = df["tahun"].astype(int)
 
-    # Ubah ke format long agar mudah visualisasi
+    # Ubah ke format long agar mudah divisualisasikan
     df_melted = df.melt(id_vars=["tahun", "bulan", "Angka Acak"], 
                         var_name="Wilayah", value_name="Jumlah Pasien")
     df_melted["Jumlah Pasien"] = pd.to_numeric(df_melted["Jumlah Pasien"], errors="coerce").fillna(0)
+
     return df_melted
 
 # Load data
@@ -56,8 +58,7 @@ col2.metric("Jumlah Wilayah", len(selected_wilayah))
 # Grafik Tren per Bulan
 st.subheader("📈 Tren Kunjungan per Bulan")
 fig_trend = px.line(filtered_df, x="bulan", y="Jumlah Pasien", color="Wilayah",
-                    title="Tren Kunjungan Pasien per Wilayah",
-                    markers=True)
+                    title="Tren Kunjungan Pasien per Wilayah", markers=True)
 st.plotly_chart(fig_trend, use_container_width=True)
 
 # Distribusi per Wilayah (Bar)
