@@ -6,7 +6,6 @@ import os
 # Konfigurasi halaman
 st.set_page_config(page_title="Dashboard Simulasi Monte Carlo", layout="wide")
 
-# Judul Dashboard
 st.title("📊 Dashboard Simulasi Monte Carlo")
 
 # Sidebar Menu
@@ -68,30 +67,35 @@ data_sources = {
     }
 }
 
-# Pilihan cara akses data
+# Pilihan sumber data
 st.sidebar.subheader("Pilih Sumber Data")
 source_option = st.sidebar.radio("Ambil data dari:", ["Lokal (CSV)", "Google Drive Link"])
 
-# Pilih data sesuai menu
+# Pilih file
 file_info = data_sources[menu]
 file_path = file_info["file"]
 gdrive_link = file_info["gdrive"]
 
-# Load Data
+# Fungsi untuk konversi Google Drive link ke format gdown
+def convert_gdrive_link(link):
+    if "/d/" in link:
+        file_id = link.split("/d/")[1].split("/")[0]
+        return f"https://drive.google.com/uc?id={file_id}"
+    return link
+
+# Load data
 st.subheader(f"📄 {menu}")
 
 try:
     if source_option == "Lokal (CSV)":
-        # Baca file dari lokal
         df = pd.read_csv(file_path)
     else:
-        # Download dari Google Drive & baca
+        download_url = convert_gdrive_link(gdrive_link)
         output_file = file_path
         if not os.path.exists(output_file):
-            gdown.download(gdrive_link, output_file, quiet=False)
+            gdown.download(download_url, output_file, quiet=False)
         df = pd.read_csv(output_file)
 
-    # Tampilkan data
     st.dataframe(df, use_container_width=True)
     st.markdown(f"**Jumlah Data:** {len(df)} baris")
 except Exception as e:
