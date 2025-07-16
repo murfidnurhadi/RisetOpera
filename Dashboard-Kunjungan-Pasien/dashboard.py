@@ -31,11 +31,11 @@ source_option = st.sidebar.radio("Ambil data dari:", ["Otomatis (Lokal/Drive)", 
 data_sources = {
     "Data Kunjungan Pasien": {
         "file": "Data_Kunjungan_Pasien.csv",
-        "gdrive": "https://drive.google.com/file/d/1cvmZN48OFsZz4-Gy6cVoQXoU9qFkzD9a/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/1GUHcM1xVSjU4aEIuH2QmRYFGYo0cCDEH/view?usp=sharing"
     },
     "Data Train": {
         "file": "DataTrain.csv",
-        "gdrive": "https://drive.google.com/file/d/1vLyXjeN5tYDAgUFiXbHi-W32GfKm3eXx/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/1pE3zOdCEyD_i8uFY1MSPWqleMafbgPXC/view?usp=sharing"
     },
     "Kota Cirebon": {
         "file": "DataKotaCirebon.csv",
