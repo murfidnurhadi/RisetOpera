@@ -30,7 +30,7 @@ source_option = st.sidebar.radio("Ambil data dari:", ["Otomatis (Lokal/Drive)", 
 data_sources = {
     "Data Kunjungan Pasien": {
         "file": "Data_Kunjungan_Pasien.csv",
-        "gdrive": "https://drive.google.com/file/d/1AgGhdLZiPDIBxUcVkipYN2GAy2tAIM9z/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/1GUHcM1xVSjU4aEIuH2QmRYFGYo0cCDEH/view?usp=sharing"
     },
     "Data Train": {
         "file": "DataTrain.csv",
