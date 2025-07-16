@@ -115,7 +115,7 @@ data_sources = {
     "Simulasi": [
         {
             "file": "Simulasi_Monte_Carlo.csv",
-            "gdrive": "https://drive.google.com/file/d/1sbZlQXUjU7Km5pQrCcM4e1gmOL0mAzzX/view?usp=sharing",
+            "gdrive": "https://drive.google.com/file/d/1yTwSGuuuNOp438un394-OV6AB5xcwAL4/view?usp=sharing",
             "judul": "Hasil Simulasi Monte Carlo"
         }
     ],
