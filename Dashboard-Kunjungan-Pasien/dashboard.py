@@ -127,10 +127,43 @@ elif uploaded_file is not None:
 else:
     df = pd.DataFrame()
 
-# Tampilkan data
+# Tampilkan data sesuai menu
 st.subheader(f"📄 {menu}")
-if not df.empty:
-    st.dataframe(df, use_container_width=True)
-    st.markdown(f"**Jumlah Data:** {len(df)} baris")
+
+if menu == "Kab Cirebon":
+    # 3 tabel: 2 sejajar, 1 di bawah
+    df1 = df
+    df2 = pd.read_csv(os.path.join(base_path, "Statistik_KabCirebon.csv"))
+    df3 = pd.read_csv(os.path.join(base_path, "Distribusi_KabCirebon.csv"))
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("### Tabel Data Bulanan")
+        st.dataframe(df1, use_container_width=True)
+
+    with col2:
+        st.markdown("### Tabel Statistik Deskriptif")
+        st.dataframe(df2, use_container_width=True)
+
+    st.markdown("### Tabel Distribusi Frekuensi")
+    st.dataframe(df3, use_container_width=True)
+
+elif menu == "RNG LCG":
+    # 2 tabel berjajar ke bawah
+    df1 = df
+    df2 = pd.read_csv(os.path.join(base_path, "RNG_LCG_Distribusi.csv"))
+
+    st.markdown("### Tabel RNG LCG")
+    st.dataframe(df1, use_container_width=True)
+
+    st.markdown("### Tabel Distribusi RNG LCG")
+    st.dataframe(df2, use_container_width=True)
+
 else:
-    st.warning("⚠ Tidak ada data yang ditampilkan. Pastikan Anda memilih sumber data yang benar.")
+    # Default: tampilkan 1 tabel biasa
+    if not df.empty:
+        st.dataframe(df, use_container_width=True)
+        st.markdown(f"**Jumlah Data:** {len(df)} baris")
+    else:
+        st.warning("⚠ Tidak ada data yang ditampilkan. Pastikan Anda memilih sumber data yang benar.")
