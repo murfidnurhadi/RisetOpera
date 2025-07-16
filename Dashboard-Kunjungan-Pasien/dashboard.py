@@ -38,19 +38,11 @@ data_sources = {
     },
     "Kota Cirebon": {
         "file": "DataKotaCirebon.csv",
-        "gdrive": "https://drive.google.com/file/d/19ae9zMmGu8xc79VPCK9mPVXTkUu27tJI/view?usp=sharing",
-        "tambahan": {
-            "Statistik": "https://drive.google.com/file/d/1P4b0DQuK2WeD9B8tWAWuss-Z1xoC0CEz/view?usp=sharing",
-            "Distribusi": "https://drive.google.com/file/d/1vByf56GEQZ7W6eZdXh602MXWd7xVZlNh/view?usp=sharing"
-        }
+        "gdrive": "https://drive.google.com/file/d/19ae9zMmGu8xc79VPCK9mPVXTkUu27tJI/view?usp=sharing"
     },
     "Kab Cirebon": {
         "file": "DataKabCirebon.csv",
-        "gdrive": "https://drive.google.com/file/d/1qwDqsL9D71Id7js4isF9Azcit-gaOAaT/view?usp=sharing",
-        "tambahan": {
-            "Statistik": "https://drive.google.com/file/d/1xXXXXXXXx_Statistik/view?usp=sharing",
-            "Distribusi": "https://drive.google.com/file/d/1xXXXXXXXx_Distribusi/view?usp=sharing"
-        }
+        "gdrive": "https://drive.google.com/file/d/1qwDqsL9D71Id7js4isF9Azcit-gaOAaT/view?usp=sharing"
     },
     "Kuningan": {
         "file": "DataKotaKuningan.csv",
@@ -70,17 +62,13 @@ data_sources = {
     },
     "RNG LCG": {
         "file": "RNG_LCG.csv",
-        "gdrive": "https://drive.google.com/file/d/1lWjneuxb7ecQZainm_igSmB24BXYmrmb/view?usp=sharing",
-        "tambahan": {
-            "Distribusi": "https://drive.google.com/file/d/1xXXXXXXXx_DistribusiRNG/view?usp=sharing"
-        }
+        "gdrive": "https://drive.google.com/file/d/1lWjneuxb7ecQZainm_igSmB24BXYmrmb/view?usp=sharing"
     },
     "Simulasi": {
         "file": "Simulasi_Monte_Carlo.csv",
         "gdrive": "https://drive.google.com/file/d/1sbZlQXUjU7Km5pQrCcM4e1gmOL0mAzzX/view?usp=sharing"
     }
 }
-
 
 file_info = data_sources[menu]
 base_path = os.path.dirname(__file__)
