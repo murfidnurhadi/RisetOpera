@@ -8,7 +8,7 @@ st.set_page_config(layout="wide", page_title="Dashboard Kunjungan Pasien", page_
 # Fungsi untuk memuat data
 @st.cache_data
 def load_data():
-    file_path = "Data Kujungan Pasien.csv"  # Pastikan file ada di repo GitHub Anda
+    file_path = "Data_Kujungan_Pasien.csv"  # Pastikan file ada di repo GitHub Anda
     # Skip baris awal yang bukan data
     df = pd.read_csv(file_path, skiprows=2)
     
