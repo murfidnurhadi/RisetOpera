@@ -97,7 +97,7 @@ def load_data(local_path, gdrive_url):
             except UnicodeDecodeError:
                 df = pd.read_csv(local_path, encoding="ISO-8859-1")
 
-        if df.shape[1] == 1:  # delimiter salah?
+        if df.shape[1] == 1:
             try:
                 df = pd.read_csv(local_path, delimiter=";", encoding="utf-8")
             except UnicodeDecodeError:
@@ -136,8 +136,19 @@ if source_option == "Upload Manual":
     uploaded_file = st.file_uploader("Unggah file CSV", type=["csv"])
 
 # === Logika tampilkan data ===
-if menu == "Kota Cirebon":
-    show_dataset("Kota Cirebon", source_option, uploaded_file)
-    show_dataset("Data Kunjungan Pasien", source_option, uploaded_file)
+
+multiple_dataset_menu = {
+    "Kota Cirebon": ["Kota Cirebon", "Data Kunjungan Pasien"],
+    "Kab Cirebon": ["Kab Cirebon", "Data Kunjungan Pasien"],
+    "Kuningan": ["Kuningan", "Data Kunjungan Pasien"],
+    "Indramayu": ["Indramayu", "Data Kunjungan Pasien"],
+    "Majalengka": ["Majalengka", "Data Kunjungan Pasien"],
+    "Lain2": ["Lain2", "Data Kunjungan Pasien"],
+    "RNG LCG": ["RNG LCG", "Data Train"]
+}
+
+if menu in multiple_dataset_menu:
+    for dataset in multiple_dataset_menu[menu]:
+        show_dataset(dataset, source_option, uploaded_file)
 else:
     show_dataset(menu, source_option, uploaded_file)
