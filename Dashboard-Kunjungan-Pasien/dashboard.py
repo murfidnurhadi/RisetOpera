@@ -10,8 +10,8 @@ st.title("📊 Dashboard Simulasi Monte Carlo")
 # Sidebar menu navigasi
 st.sidebar.header("Menu Navigasi")
 menu = st.sidebar.radio("Pilih Dataset:", [
-st.image("https://raw.githubusercontent.com/murfidnurhadi/simulasi_monte_carlo/main/Dashboard-Kunjungan-Pasien/images/unikom.png", width=150),
-st.image("https://raw.githubusercontent.com/murfidnurhadi/simulasi_monte_carlo/main/Dashboard-Kunjungan-Pasien/images/kelompok6.png", width=450),
+    "https://raw.githubusercontent.com/murfidnurhadi/simulasi_monte_carlo/main/Dashboard-Kunjungan-Pasien/images/unikom.png", width=150),
+    "https://raw.githubusercontent.com/murfidnurhadi/simulasi_monte_carlo/main/Dashboard-Kunjungan-Pasien/images/kelompok6.png", width=450),
     "Data Kunjungan Pasien",
     "Data Train",
     "Kota Cirebon",
