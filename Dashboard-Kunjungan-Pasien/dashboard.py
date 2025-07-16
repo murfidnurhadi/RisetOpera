@@ -47,7 +47,7 @@ data_sources = {
         },
         {
             "file": "DataIntervalKotaCirebon.csv",
-            "gdrive": "https://drive.google.com/file/d/NEW_LINK_TAMBAHAN/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/1jbyntLDGUegAL-9n-uJWwVsH-V1UrxDp/view?usp=sharing"
         }
     ],
     "Kab Cirebon": [
