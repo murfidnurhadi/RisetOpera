@@ -1,4 +1,4 @@
-id,Bulan,Nama_Wilayah,Jumlah,Tahun,,,,,Tabel Distribusi Frekuensi,,,,
+id,Bulan,Nama_Wilayah,Jumlah,Tahun,,,,,Tabel Distribusi Frekuensi,,,
 1,Januari,Kab Cirebon,557,2021,,Xmaks,1443,,,,,,,,,
 2,Februari,Kab Cirebon,518,2021,,Xmin,490,,No,Jumlah,,Frekuensi,Probabilitas,Prob. Kumulatif,Interval Angka Acak,
 3,Maret,Kab Cirebon,684,2021,,Jangkauan,953,,,,,,,,,
