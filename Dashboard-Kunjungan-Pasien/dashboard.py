@@ -82,20 +82,26 @@ def convert_gdrive_link(link):
     return link
 
 # -----------------------
-# Fungsi Load Data
+# Fungsi Load Data dengan Fallback Encoding
 # -----------------------
 @st.cache_data
 def load_data(local_path, gdrive_url):
     try:
-        if os.path.exists(local_path):
-            df = pd.read_csv(local_path, low_memory=False)
-        else:
+        if not os.path.exists(local_path):
             st.info(f"📥 Mengunduh {os.path.basename(local_path)} dari Google Drive...")
             gdown.download(convert_gdrive_link(gdrive_url), local_path, quiet=False)
+
+        # Coba baca dengan UTF-8 dulu
+        try:
             df = pd.read_csv(local_path, low_memory=False)
+        except UnicodeDecodeError:
+            df = pd.read_csv(local_path, encoding="ISO-8859-1", low_memory=False)
 
         if df.shape[1] == 1:  # jika delimiter salah
-            df = pd.read_csv(local_path, delimiter=";", low_memory=False)
+            try:
+                df = pd.read_csv(local_path, delimiter=";", encoding="utf-8", low_memory=False)
+            except UnicodeDecodeError:
+                df = pd.read_csv(local_path, delimiter=";", encoding="ISO-8859-1", low_memory=False)
 
         return df
     except Exception as e:
@@ -120,17 +126,23 @@ else:
         st.subheader(f"📄 Dataset {idx+1} - {os.path.basename(info['file'])}")
         file_path = os.path.join(os.getcwd(), info["file"])
 
+        # Load data
         if source_option == "Otomatis (Lokal/Drive)":
             df = load_data(file_path, info["gdrive"])
         elif uploaded_file:
-            df = pd.read_csv(uploaded_file, low_memory=False)
+            try:
+                df = pd.read_csv(uploaded_file, encoding="utf-8", low_memory=False)
+            except UnicodeDecodeError:
+                df = pd.read_csv(uploaded_file, encoding="ISO-8859-1", low_memory=False)
         else:
             df = pd.DataFrame()
 
+        # Jika kosong
         if df.empty:
             st.warning("⚠ Tidak ada data untuk ditampilkan.")
             continue
 
+        # Tampilkan Data
         st.dataframe(df, use_container_width=True)
         st.markdown(f"**Jumlah Data:** {len(df)} baris")
 
@@ -139,7 +151,7 @@ else:
             df_filtered = df.copy()
             for col in df.columns:
                 if df[col].dtype == "object":
-                    options = st.multiselect(f"Filter {col}", df[col].dropna().unique())
+                    options = st.multiselect(f"Filter {col}", df[col].dropna().unique(), key=f"filter_{col}_{idx}")
                     if options:
                         df_filtered = df_filtered[df_filtered[col].isin(options)]
                 else:
@@ -147,7 +159,7 @@ else:
                         min_val = float(df[col].min())
                         max_val = float(df[col].max())
                         if min_val != max_val:
-                            min_slider, max_slider = st.slider(f"Rentang {col}", min_val, max_val, (min_val, max_val))
+                            min_slider, max_slider = st.slider(f"Rentang {col}", min_val, max_val, (min_val, max_val), key=f"slider_{col}_{idx}")
                             df_filtered = df_filtered[(df_filtered[col] >= min_slider) & (df_filtered[col] <= max_slider)]
                     except:
                         pass
@@ -172,6 +184,12 @@ else:
             except:
                 st.warning("⚠ Tidak bisa membuat grafik. Pastikan kolom numerik untuk Y.")
 
-        # ✅ Download
+        # ✅ Download Button (Fix Duplicate ID)
         csv = df_filtered.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Download Data (CSV)", csv, file_name="filtered_data.csv", mime="text/csv")
+        st.download_button(
+            label="📥 Download Data (CSV)",
+            data=csv,
+            file_name=f"filtered_data_{idx}.csv",
+            mime="text/csv",
+            key=f"download_{idx}"
+        )
