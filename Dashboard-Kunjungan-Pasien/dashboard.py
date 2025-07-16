@@ -31,43 +31,43 @@ source_option = st.sidebar.radio("Ambil data dari:", ["Otomatis (Lokal/Drive)", 
 data_sources = {
     "Data Kunjungan Pasien": {
         "file": "Data_Kunjungan_Pasien.csv",
-        "gdrive": "https://drive.google.com/file/d/1AgGhdLZiPDIBxUcVkipYN2GAy2tAIM9z/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/1cvmZN48OFsZz4-Gy6cVoQXoU9qFkzD9a/view?usp=sharing"
     },
     "Data Train": {
         "file": "DataTrain.csv",
-        "gdrive": "https://drive.google.com/file/d/11tgNQ2GqMSIM97DH2U9HNTbIh4CceuiF/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/1vLyXjeN5tYDAgUFiXbHi-W32GfKm3eXx/view?usp=sharing"
     },
     "Kota Cirebon": {
         "file": "DataKotaCirebon.csv",
-        "gdrive": "https://drive.google.com/file/d/19ae9zMmGu8xc79VPCK9mPVXTkUu27tJI/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/18Xieo21oEz364MyTN4Mylbqi7Vz8VNaI/view?usp=sharing"
     },
     "Kab Cirebon": {
         "file": "DataKabCirebon.csv",
-        "gdrive": "https://drive.google.com/file/d/1qwDqsL9D71Id7js4isF9Azcit-gaOAaT/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/1-5uMWGJ-9dSQwGPo8TOKFAig3U44Gyue/view?usp=sharing"
     },
     "Kuningan": {
         "file": "DataKotaKuningan.csv",
-        "gdrive": "https://drive.google.com/file/d/1A3nd6dqBKeRzOo3Cpdd4BWl2g6qNxwVY/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/1_qilfpMwNz0jZ83L-Rk9WIDIURSvFptK/view?usp=sharing"
     },
     "Indramayu": {
         "file": "DataKotaIndramayu.csv",
-        "gdrive": "https://drive.google.com/file/d/1a_t5kUyDzSrI0WILSqyPTy3LVKdBUwjU/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/11NbPohAAUxyXXIb3bJNsM0436Owb777Z/view?usp=sharing"
     },
     "Majalengka": {
         "file": "DataKotaMajalengka.csv",
-        "gdrive": "https://drive.google.com/file/d/1Ef4Gnl4o-5xDyX5Wu9OnQ0LRNRIb_grb/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/1l6DpYU44tkY7cauoH9a11OG_wV0KxC9R/view?usp=sharing"
     },
     "Lain2": {
         "file": "DataKotaLain2.csv",
-        "gdrive": "https://drive.google.com/file/d/1-2jsT3vhWqFDIdmGep40PCUv1lhKxE6N/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/1-9G0yXDxknArbNVI_wLvF8PW8OPnqkuv/view?usp=sharing"
     },
     "RNG LCG": {
         "file": "RNG_LCG.csv",
-        "gdrive": "https://drive.google.com/file/d/1lWjneuxb7ecQZainm_igSmB24BXYmrmb/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/1DQI43a9-DEnP3FD1Rrl3WaWSS9XPTD9p/view?usp=sharing"
     },
     "Simulasi": {
         "file": "Simulasi_Monte_Carlo.csv",
-        "gdrive": "https://drive.google.com/file/d/1sbZlQXUjU7Km5pQrCcM4e1gmOL0mAzzX/view?usp=sharing"
+        "gdrive": "https://drive.google.com/file/d/1vWcvlQb3N-C-SWmqbGN0uoSgngWQUDmP/view?usp=sharing"
     }
 }
 
