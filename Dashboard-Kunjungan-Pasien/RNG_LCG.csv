@@ -4,8 +4,8 @@ c,17,,
 m,100,,
 z0,42,,
 ,,,
-RNG LCG Kota Cirebon,,
-i,zi-1,zi (Random Integer Number),Ui (Uniform R. N),,
+RNG LCG Kota Cirebon,,,
+i,zi-1,zi (Random Integer Number),Ui (Uniform R. N)
 4,42,99,0.99
 5,99,96,0.96
 6,96,33,0.33
