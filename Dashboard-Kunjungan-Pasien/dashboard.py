@@ -43,7 +43,7 @@ data_sources = {
     "Kota Cirebon": [
         {
             "file": "DataTrainKotaCirebon.csv",
-            "gdrive": "https://drive.google.com/file/d/12-5l_9EFB_VRARq6CIOMTlaWH2VOx9wO/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/1ptLOuscYMjzGw_v6qOI_Gvmc6t-kW9OS/view?usp=sharing"
         },
         {
             "file": "DataIntervalKotaCirebon.csv",
@@ -57,27 +57,27 @@ data_sources = {
         },
         {
             "file": "DataIntervalKabCirebon.csv",
-            "gdrive": "https://drive.google.com/file/d/NEW_LINK_TAMBAHAN/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/1uM_5BcU1Zbl998W4yE5XsDcfiyj_itdC/view?usp=sharing"
         }
     ],
     "Kuningan": [
         {
             "file": "DataTrainKuningan.csv",
-            "gdrive": "https://drive.google.com/file/d/12-5l_9EFB_VRARq6CIOMTlaWH2VOx9wO/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/113p_LARFjkQthew9S3t0dXdBq4sqME9H/view?usp=sharing"
         },
         {
             "file": "DataIntervalKuningan.csv",
-            "gdrive": "https://drive.google.com/file/d/NEW_LINK_TAMBAHAN/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/1yYhh5m3YIkLaCNP6hERswTAQ8pv6kyfW/view?usp=sharing"
         }
     ],
     "Indramayu": [
         {
             "file": "DataTrainIndramayu.csv",
-            "gdrive": "https://drive.google.com/file/d/12-5l_9EFB_VRARq6CIOMTlaWH2VOx9wO/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/118Hl_6dvhYUgeE6tQG-aG_Amq1OneWlL/view?usp=sharing"
         },
         {
             "file": "DataIntervalIndramayu.csv",
-            "gdrive": "https://drive.google.com/file/d/NEW_LINK_TAMBAHAN/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/1n94Wtw5RYS1zwABz0xosM4N1JMob1rXW/view?usp=sharing"
         }
     ],
     "Majalengka": [
@@ -87,27 +87,27 @@ data_sources = {
         },
         {
             "file": "DataIntervalMajalengka.csv",
-            "gdrive": "https://drive.google.com/file/d/NEW_LINK_TAMBAHAN/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/1QydFBUgwsrsV1kz9djJ06oz0KfHBZpIw/view?usp=sharing"
         }
     ],
         "Lain2": [
         {
             "file": "DataTrainLain2.csv",
-            "gdrive": "https://drive.google.com/file/d/12-5l_9EFB_VRARq6CIOMTlaWH2VOx9wO/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/1BuDy0YlPazm7eoCabXHUq-BzsiKVDG67/view?usp=sharing"
         },
         {
             "file": "DataIntervalLain2.csv",
-            "gdrive": "https://drive.google.com/file/d/NEW_LINK_TAMBAHAN/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/1VinCHBclblPMivT_Xndg6-DAjC3wf9_w/view?usp=sharing"
         }
     ],
         "RNG LCG": [
         {
             "file": "RNG.csv",
-            "gdrive": "https://drive.google.com/file/d/12-5l_9EFB_VRARq6CIOMTlaWH2VOx9wO/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/1fBZgfx9rYpBv29trUKkR1h9KT36g7udD/view?usp=sharing"
         },
         {
             "file": "LCG.csv",
-            "gdrive": "https://drive.google.com/file/d/NEW_LINK_TAMBAHAN/view?usp=sharing"
+            "gdrive": "https://drive.google.com/file/d/1MJMALE9054J2F6c1w-HYNRe9sftk2JGP/view?usp=sharing"
         }
     ],
     "Simulasi": [
