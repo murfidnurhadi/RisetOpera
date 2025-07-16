@@ -40,10 +40,6 @@ data_sources = {
         "file": "DataKotaCirebon.csv",
         "gdrive": "https://drive.google.com/file/d/19ae9zMmGu8xc79VPCK9mPVXTkUu27tJI/view?usp=sharing"
     },
-    "Kota Cirebon": {
-        "file": "DataKotaCirebon.csv",
-        "gdrive": "https://drive.google.com/file/d/19ae9zMmGu8xc79VPCK9mPVXTkUu27tJI/view?usp=sharing"
-    },
     "Kab Cirebon": {
         "file": "DataKabCirebon.csv",
         "gdrive": "https://drive.google.com/file/d/1qwDqsL9D71Id7js4isF9Azcit-gaOAaT/view?usp=sharing"
@@ -74,10 +70,7 @@ data_sources = {
     }
 }
 
-file_info = data_sources[menu]
 base_path = os.path.dirname(__file__)
-file_path = os.path.join(base_path, file_info["file"])
-gdrive_link = file_info["gdrive"]
 
 # Fungsi konversi link Google Drive
 def convert_gdrive_link(link):
@@ -88,7 +81,7 @@ def convert_gdrive_link(link):
 
 # Fungsi untuk memuat data
 @st.cache_data
-def load_data_automatic(local_path, gdrive_url):
+def load_data(local_path, gdrive_url):
     try:
         if os.path.exists(local_path):
             try:
@@ -96,7 +89,7 @@ def load_data_automatic(local_path, gdrive_url):
             except UnicodeDecodeError:
                 df = pd.read_csv(local_path, encoding="ISO-8859-1")
         else:
-            st.info("📥 File lokal tidak ditemukan, mencoba unduh dari Google Drive...")
+            st.info(f"📥 File lokal {os.path.basename(local_path)} tidak ditemukan, mencoba unduh dari Google Drive...")
             download_url = convert_gdrive_link(gdrive_url)
             gdown.download(download_url, local_path, quiet=False)
             try:
@@ -104,7 +97,7 @@ def load_data_automatic(local_path, gdrive_url):
             except UnicodeDecodeError:
                 df = pd.read_csv(local_path, encoding="ISO-8859-1")
 
-        if df.shape[1] == 1:  # Jika delimiter salah
+        if df.shape[1] == 1:  # delimiter salah?
             try:
                 df = pd.read_csv(local_path, delimiter=";", encoding="utf-8")
             except UnicodeDecodeError:
@@ -115,26 +108,36 @@ def load_data_automatic(local_path, gdrive_url):
         st.error(f"Gagal memuat data: {e}")
         return pd.DataFrame()
 
-# Pilihan Upload Manual
+# Fungsi menampilkan dataset
+def show_dataset(name, source, upload_file=None):
+    st.subheader(f"📄 {name}")
+    info = data_sources[name]
+    file_path = os.path.join(base_path, info["file"])
+
+    if source == "Otomatis (Lokal/Drive)":
+        df = load_data(file_path, info["gdrive"])
+    elif upload_file is not None:
+        try:
+            df = pd.read_csv(upload_file, encoding="utf-8")
+        except UnicodeDecodeError:
+            df = pd.read_csv(upload_file, encoding="ISO-8859-1")
+    else:
+        df = pd.DataFrame()
+
+    if not df.empty:
+        st.dataframe(df, use_container_width=True)
+        st.markdown(f"**Jumlah Data:** {len(df)} baris")
+    else:
+        st.warning(f"⚠ Tidak ada data yang ditampilkan untuk {name}.")
+
+# Upload manual (jika dipilih)
 uploaded_file = None
 if source_option == "Upload Manual":
     uploaded_file = st.file_uploader("Unggah file CSV", type=["csv"])
 
-# Load data sesuai pilihan
-if source_option == "Otomatis (Lokal/Drive)":
-    df = load_data_automatic(file_path, gdrive_link)
-elif uploaded_file is not None:
-    try:
-        df = pd.read_csv(uploaded_file, encoding="utf-8")
-    except UnicodeDecodeError:
-        df = pd.read_csv(uploaded_file, encoding="ISO-8859-1")
+# === Logika tampilkan data ===
+if menu == "Kota Cirebon":
+    show_dataset("Kota Cirebon", source_option, uploaded_file)
+    show_dataset("Data Kunjungan Pasien", source_option, uploaded_file)
 else:
-    df = pd.DataFrame()
-
-# Tampilkan data
-st.subheader(f"📄 {menu}")
-if not df.empty:
-    st.dataframe(df, use_container_width=True)
-    st.markdown(f"**Jumlah Data:** {len(df)} baris")
-else:
-    st.warning("⚠ Tidak ada data yang ditampilkan. Pastikan Anda memilih sumber data yang benar.")
+    show_dataset(menu, source_option, uploaded_file)
