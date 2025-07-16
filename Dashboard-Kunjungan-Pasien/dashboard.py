@@ -38,7 +38,10 @@ data_sources = {
     },
     "Kota Cirebon": {
         "file": "DataKotaCirebon.csv",
-        "gdrive": "https://drive.google.com/file/d/19ae9zMmGu8xc79VPCK9mPVXTkUu27tJI/view?usp=sharing",
+        "gdrive": "https://drive.google.com/file/d/19ae9zMmGu8xc79VPCK9mPVXTkUu27tJI/view?usp=sharing"
+    },
+    "Kota Cirebon": {
+        "file": "DataKotaCirebon.csv",
         "gdrive": "https://drive.google.com/file/d/19ae9zMmGu8xc79VPCK9mPVXTkUu27tJI/view?usp=sharing"
     },
     "Kab Cirebon": {
