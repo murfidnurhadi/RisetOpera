@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import gdown
 import os
+import math
 
 # -----------------------
 # Konfigurasi Halaman
@@ -156,7 +157,7 @@ else:
             )
             continue
 
-        # ✅ Filter Dinamis
+        # ✅ Filter Dinamis dengan Validasi NaN
         with st.expander("🔍 Filter Data"):
             df_filtered = df.copy()
             for col in df.columns:
@@ -168,8 +169,12 @@ else:
                     try:
                         min_val = float(df[col].min())
                         max_val = float(df[col].max())
-                        if min_val != max_val:
-                            min_slider, max_slider = st.slider(f"Rentang {col}", min_val, max_val, (min_val, max_val), key=f"slider_{col}_{idx}")
+                        if not math.isnan(min_val) and not math.isnan(max_val) and min_val != max_val:
+                            min_slider, max_slider = st.slider(
+                                f"Rentang {col}",
+                                min_val, max_val, (min_val, max_val),
+                                key=f"slider_{col}_{idx}"
+                            )
                             df_filtered = df_filtered[(df_filtered[col] >= min_slider) & (df_filtered[col] <= max_slider)]
                     except:
                         pass
@@ -183,5 +188,5 @@ else:
             data=csv,
             file_name=f"filtered_data_{idx}.csv",
             mime="text/csv",
-            key=f"download_{idx}"
+            key=f"download_filtered_{idx}"
         )
