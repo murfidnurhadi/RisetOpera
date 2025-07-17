@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import gdown
 import os
-import plotly.express as px
 
 # -----------------------
 # Konfigurasi Halaman
@@ -145,7 +144,7 @@ else:
         st.dataframe(df, use_container_width=True)
         st.markdown(f"**Jumlah Data:** {len(df)} baris")
 
-        # ✅ Jika Data Kunjungan Pasien → TIDAK ada filter & grafik
+        # ✅ Jika Data Kunjungan Pasien → TIDAK ada filter
         if "Data_Kunjungan_Pasien.csv" in info["file"]:
             csv = df.to_csv(index=False).encode('utf-8')
             st.download_button(
@@ -176,24 +175,6 @@ else:
                         pass
 
             st.dataframe(df_filtered)
-
-        # ✅ Visualisasi
-        if len(df_filtered.columns) >= 2:
-            st.subheader("📊 Visualisasi Data")
-            chart_type = st.radio("Pilih Grafik", ["Bar", "Line", "Pie"], horizontal=True, key=f"chart_{idx}")
-            col_x = st.selectbox("Kolom X", df_filtered.columns, key=f"x_{idx}")
-            col_y = st.selectbox("Kolom Y", df_filtered.columns, key=f"y_{idx}")
-
-            try:
-                if chart_type == "Bar":
-                    fig = px.bar(df_filtered, x=col_x, y=col_y, title="Bar Chart")
-                elif chart_type == "Line":
-                    fig = px.line(df_filtered, x=col_x, y=col_y, title="Line Chart")
-                else:
-                    fig = px.pie(df_filtered, names=col_x, values=col_y, title="Pie Chart")
-                st.plotly_chart(fig, use_container_width=True)
-            except:
-                st.warning("⚠ Tidak bisa membuat grafik. Pastikan kolom numerik untuk Y.")
 
         # ✅ Download Button
         csv = df_filtered.to_csv(index=False).encode('utf-8')
