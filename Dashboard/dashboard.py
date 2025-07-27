@@ -1,337 +1,102 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import math
-import os
-import plotly.express as px
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-# ========================
-# 🎨 Konfigurasi Halaman
-# ========================
-st.set_page_config(layout="wide", page_title="Simulasi Monte Carlo", page_icon="🎲")
+# --- Config ---
+st.set_page_config(page_title="Amazon Review Analysis", layout="wide")
+CSV_URL = "https://drive.google.com/uc?id=1MfpNbWOrLkclRtkZXEd3xA43tw_9jckN"
 
-# ========================
-# 📂 Sidebar Navigasi
-# ========================
-with st.sidebar:
-    st.title("🧭 Navigasi")
-    menu = st.radio(
-        "Pilih Halaman:",
-        ["🏠 Dashboard", "📊 Data Train", "📈 Frekuensi dan Interval", "🔢 RNG LCG", "🎲 Simulasi"]
-    )
+# --- Title ---
+st.title("📊 Amazon Reviews Analysis & Sentiment Classification")
 
-# ========================
-# 📂 Load Data
-# ========================
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-excel_path = os.path.join(BASE_DIR, "dataset", "dataset.xlsx")
-
+# --- Load Data ---
 @st.cache_data
-def load_excel():
-    if os.path.exists(excel_path):
-        df = pd.read_excel(excel_path, sheet_name="DataTrain")
+def load_data():
+    return pd.read_csv(CSV_URL)
+
+st.subheader("Load Dataset")
+if st.button("📂 Load Data"):
+    df = load_data()
+    st.success(f"Data berhasil dimuat! Jumlah baris: {df.shape[0]}, Kolom: {df.shape[1]}")
+    st.dataframe(df.head())
+
+    # --- Data Overview ---
+    st.subheader("🔍 Informasi Data")
+    st.write(df.info())
+    st.write(df.describe())
+
+    # --- Missing Values ---
+    st.subheader("🚨 Missing Values")
+    st.write(df.isnull().sum())
+
+    # --- Distribusi Label ---
+    if 'sentiment' in df.columns or 'label' in df.columns:
+        target_col = 'sentiment' if 'sentiment' in df.columns else 'label'
+        st.subheader("📊 Distribusi Sentimen")
+        fig, ax = plt.subplots()
+        sns.countplot(x=target_col, data=df, ax=ax, palette='viridis')
+        st.pyplot(fig)
     else:
-        st.warning("⚠ File Excel tidak ditemukan. Upload file .xlsx.")
-        uploaded_file = st.file_uploader("Upload file Excel (.xlsx)", type=["xlsx"])
-        if uploaded_file:
-            df = pd.read_excel(uploaded_file, sheet_name="DataTrain")
-        else:
-            return pd.DataFrame()
-    
-    # ✅ Hapus kolom kosong (Unnamed)
-    df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-    return df
+        st.warning("Kolom target (sentiment/label) tidak ditemukan.")
 
-df = load_excel()
-
-# ========================
-# 🏠 Dashboard
-# ========================
-if menu == "🏠 Dashboard":
-    st.title("📊 Dashboard Simulasi Monte Carlo")
-    if not df.empty:
-        st.write("Selamat datang! Data sudah dimuat.")
-        df.columns = df.columns.str.strip().str.lower()
-        exclude_cols = ["id", "bulan", "tahun"]
-        daerah_cols = [col for col in df.columns if col not in exclude_cols]
-
-        total_per_wilayah = df[daerah_cols].sum().sort_values(ascending=False)
-        total_seluruh = total_per_wilayah.sum()
-
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Total Pengunjung", f"{total_seluruh:,}".replace(",", "."))
-        col2.metric("Wilayah Terbanyak", total_per_wilayah.idxmax(), f"{total_per_wilayah.max():,}".replace(",", "."))
-        col3.metric("Wilayah Tersedikit", total_per_wilayah.idxmin(), f"{total_per_wilayah.min():,}".replace(",", "."))
-
-        grafik_df = total_per_wilayah.reset_index()
-        grafik_df.columns = ["Wilayah", "Total_Pengunjung"]
-
-        fig = px.bar(
-            grafik_df,
-            x="Wilayah",
-            y="Total_Pengunjung",
-            color="Wilayah",
-            text="Total_Pengunjung",
-            title="Total Pengunjung per Wilayah",
-            color_discrete_sequence=px.colors.qualitative.Set3
-        )
-        fig.update_traces(texttemplate='%{text:,}', textposition='outside')
-        st.plotly_chart(fig, use_container_width=True)
+    # --- Numeric Distribution ---
+    st.subheader("📈 Distribusi Kolom Numerik")
+    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+    if numeric_cols:
+        col = st.selectbox("Pilih Kolom Numerik:", numeric_cols)
+        fig, ax = plt.subplots()
+        sns.histplot(df[col], bins=30, kde=True, ax=ax, color='blue')
+        st.pyplot(fig)
     else:
-        st.warning("Upload file Excel terlebih dahulu.")
+        st.warning("Tidak ada kolom numerik.")
 
-# ========================
-# 📊 Data Train
-# ========================
-elif menu == "📊 Data Train":
-    st.title("📊 Data Train Pengunjung")
-    if not df.empty:
-        st.dataframe(df.reset_index(drop=True), use_container_width=True, hide_index=True)
-    else:
-        st.warning("Data tidak tersedia.")
+    # --- Model Training ---
+    st.subheader("🤖 Machine Learning Model")
+    text_col = st.selectbox("Pilih kolom teks untuk analisis:", df.columns)
+    label_col = st.selectbox("Pilih kolom label:", df.columns)
 
-# ========================
-# 📈 Frekuensi & Interval
-# ========================
-elif menu == "📈 Frekuensi dan Interval":
-    st.title("📈 Distribusi Frekuensi dan Interval")
-    if not df.empty:
-        df.columns = df.columns.str.strip().str.lower()
-        exclude_cols = ["id", "bulan", "tahun"]
-        daerah_cols = [col for col in df.columns if col not in exclude_cols]
+    if st.button("🚀 Train Model"):
+        # Preprocessing
+        df = df.dropna(subset=[text_col, label_col])
+        X = df[text_col].astype(str)
+        y = df[label_col]
 
-        selected_daerah = st.selectbox("📍 Pilih Daerah:", ["Pilih daerah"] + daerah_cols)
-        if selected_daerah != "Pilih daerah":
-            data = df[selected_daerah].dropna()
-            n = len(data)
-            x_min, x_max = data.min(), data.max()
-            R = x_max - x_min
-            k = math.ceil(1 + 3.3 * math.log10(n))
-            h = math.ceil(R / k)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-            # Buat interval kelas
-            lower = math.floor(x_min)
-            bins = []
-            for _ in range(k):
-                upper = lower + h
-                bins.append((lower, upper))
-                lower = upper + 1
+        vectorizer = TfidfVectorizer(max_features=5000)
+        X_train_tfidf = vectorizer.fit_transform(X_train)
+        X_test_tfidf = vectorizer.transform(X_test)
 
-            labels = [f"{low} - {high}" for low, high in bins]
-            cut_bins = [b[0] for b in bins] + [bins[-1][1]]
+        model = LogisticRegression(max_iter=1000)
+        model.fit(X_train_tfidf, y_train)
 
-            kelas = pd.cut(data, bins=cut_bins, labels=labels, include_lowest=True, right=True)
-            freq_table = kelas.value_counts().sort_index().reset_index()
-            freq_table.columns = ["Interval Jumlah", "Frekuensi"]
+        y_pred = model.predict(X_test_tfidf)
+        acc = accuracy_score(y_test, y_pred)
 
-            # ✅ Tambah Titik Tengah
-            bounds = freq_table["Interval Jumlah"].str.split(" - ", expand=True).astype(int)
-            freq_table["Titik Tengah"] = ((bounds[0] + bounds[1]) / 2).round(0).astype(int)
+        st.success(f"✅ Model Trained! Akurasi: {acc:.4f}")
+        st.text("Classification Report:")
+        st.text(classification_report(y_test, y_pred))
 
-            # Probabilitas & kumulatif
-            prob_raw = freq_table["Frekuensi"] / n
-            prob_rounded = prob_raw.round(2)
-            selisih = 1.00 - prob_rounded.sum()
-            if abs(selisih) > 0:
-                idx_max = prob_rounded.idxmax()
-                prob_rounded.iloc[idx_max] += selisih
+        # Confusion Matrix
+        st.subheader("📌 Confusion Matrix")
+        cm = confusion_matrix(y_test, y_pred)
+        fig, ax = plt.subplots()
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
+        st.pyplot(fig)
 
-            freq_table["Probabilitas"] = prob_rounded
-            freq_table["Prob. Kumulatif"] = freq_table["Probabilitas"].cumsum().round(2)
-            freq_table["P.K * 100"] = (freq_table["Prob. Kumulatif"] * 100).astype(int)
-
-            # Interval Angka Acak
-            upper_bounds = freq_table["P.K * 100"]
-            lower_bounds = [1] + [ub + 1 for ub in upper_bounds[:-1]]
-            freq_table["Interval Angka Acak"] = [f"{lb} - {ub}" for lb, ub in zip(lower_bounds, upper_bounds)]
-
-            # ✅ Format angka
-            freq_table["Titik Tengah"] = freq_table["Titik Tengah"].apply(lambda x: f"{x:,}".replace(",", "."))
-
-            st.dataframe(freq_table, use_container_width=True)
-            st.session_state['freq_table'] = freq_table
-
-            # Info tambahan
-            st.markdown("---")
-            st.subheader("ℹ️ Informasi Tambahan")
-            col1, col2, col3, col4, col5, col6 = st.columns(6)
-            col1.metric("Xmin", x_min)
-            col2.metric("Xmax", x_max)
-            col3.metric("Range (R)", R)
-            col4.metric("Kelas (k)", k)
-            col5.metric("Panjang (h)", h)
-            col6.metric("Jumlah Data (n)", n)
-    else:
-        st.warning("Data tidak tersedia.")
-
-# ========================
-# 🔢 RNG LCG
-# ========================
-elif menu == "🔢 RNG LCG":
-    st.title("🔢 RNG LCG (Linear Congruential Generator)")
-
-    # Input parameter
-    a = st.number_input("Multiplier (a)", min_value=1, value=21)
-    c = st.number_input("Increment (c)", min_value=0, value=17)
-    m = st.number_input("Modulus (m)", min_value=1, value=100)
-    z0 = st.number_input("Seed (Z₀)", min_value=0, value=42)
-    n_gen = st.number_input("Jumlah Bilangan Acak", min_value=1, value=48)
-
-    if st.button("🎲 Generate"):
-        zi = z0
-        rng_data = []
-        all_zi = []
-        duplicate_flag = False
-
-        for i in range(1, n_gen + 1):
-            zi_minus_1 = zi
-            zi = (a * zi_minus_1 + c) % m
-            ui = zi / m
-            angka_acak = int(ui * 100)
-            zi_minus_1_display = zi_minus_1 - 1
-
-            if zi in all_zi:
-                duplicate_flag = True
-            all_zi.append(zi)
-
-            rng_data.append((i, zi_minus_1_display, zi, round(ui, 4), angka_acak))
-
-        rng_df = pd.DataFrame(rng_data, columns=["i", "Zᵢ₋₁", "Zᵢ", "Uᵢ", "Angka Acak (Uᵢ×100)"])
-        st.session_state['rng_df'] = rng_df
-
-        # Tabel hasil
-        st.subheader("📊 Hasil RNG LCG")
-        st.dataframe(rng_df, use_container_width=True)
-
-        # Info duplikat
-        if duplicate_flag:
-            st.warning("⚠️ Terdapat nilai Zᵢ yang duplikat.")
-        else:
-            st.success("✅ Tidak ada duplikat.")
-
-        # Statistik RNG
-        st.markdown("### 📈 Statistik RNG")
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Total Bilangan", n_gen)
-        col2.metric("Nilai Unik", len(set(all_zi)))
-        col3.metric("Jumlah Duplikat", n_gen - len(set(all_zi)))
-
-# ========================
-# 🎲 Simulasi Monte Carlo
-# ========================
-elif menu == "🎲 Simulasi":
-    st.title("🎲 Simulasi Monte Carlo")
-    if 'rng_df' not in st.session_state:
-        st.warning("Generate bilangan acak dulu di menu RNG LCG.")
-    else:
-        rng_df = st.session_state['rng_df']
-        if not df.empty:
-            df.columns = df.columns.str.strip().str.lower()
-            exclude_cols = ["id", "bulan", "tahun"]
-            daerah_cols = [col for col in df.columns if col not in exclude_cols]
-
-            selected_daerah = st.selectbox("📍 Pilih Daerah:", ["Pilih daerah"] + daerah_cols)
-            if selected_daerah != "Pilih daerah":
-                data = df[selected_daerah].dropna()
-                n = len(data)
-
-                # Hitung interval
-                x_min, x_max = data.min(), data.max()
-                R = x_max - x_min
-                k = math.ceil(1 + 3.3 * math.log10(n))
-                h = math.ceil(R / k)
-
-                # Interval
-                lower = math.floor(x_min)
-                bins = []
-                for _ in range(k):
-                    upper = lower + h
-                    bins.append((lower, upper))
-                    lower = upper + 1
-
-                labels = [f"{low} - {high}" for low, high in bins]
-                cut_bins = [b[0] for b in bins] + [bins[-1][1]]
-
-                freq_series = pd.cut(data, bins=cut_bins, labels=labels, include_lowest=True, right=True)
-                freq_table = freq_series.value_counts().sort_index().reset_index()
-                freq_table.columns = ["Interval Jumlah", "Frekuensi"]
-
-                bounds = freq_table["Interval Jumlah"].str.split(" - ", expand=True).astype(int)
-                freq_table["Titik Tengah"] = ((bounds[0] + bounds[1]) / 2).round(0).astype(int)
-
-                # Probabilitas
-                total = freq_table["Frekuensi"].sum()
-                prob_raw = freq_table["Frekuensi"] / total
-                prob_rounded = prob_raw.round(2)
-                selisih = 1.00 - prob_rounded.sum()
-                if abs(selisih) > 0:
-                    idx_max = prob_rounded.idxmax()
-                    prob_rounded.iloc[idx_max] += selisih
-
-                freq_table["Probabilitas"] = prob_rounded
-                freq_table["Prob. Kumulatif"] = freq_table["Probabilitas"].cumsum().round(2)
-                freq_table["P.K * 100"] = (freq_table["Prob. Kumulatif"] * 100).astype(int)
-
-                upper_bounds = freq_table["P.K * 100"]
-                lower_bounds = [1] + [ub + 1 for ub in upper_bounds[:-1]]
-                freq_table["Interval Angka Acak"] = [f"{lb} - {ub}" for lb, ub in zip(lower_bounds, upper_bounds)]
-
-                # Simulasi Monte Carlo
-                def get_simulated_value(rand, freq_table):
-                    angka_acak = int(rand * 100)
-                    if angka_acak == 0: angka_acak = 1
-                    for _, row in freq_table.iterrows():
-                        low, high = map(int, row["Interval Angka Acak"].split(' - '))
-                        if low <= angka_acak <= high:
-                            return row["Titik Tengah"], angka_acak
-                    return 0, angka_acak
-
-                sim_results = []
-                for _, row in rng_df.iterrows():
-                    val, acak = get_simulated_value(row["Uᵢ"], freq_table)
-                    sim_results.append({"Bulan ke.": row["i"], "Angka Acak": acak, "Jumlah Pengunjung": val})
-
-                sim_df = pd.DataFrame(sim_results)
-                sim_df["Selisih"] = sim_df["Jumlah Pengunjung"].diff().fillna(0)
-                sim_df["Tren"] = sim_df["Selisih"].apply(lambda x: "Naik" if x > 0 else ("Turun" if x < 0 else "Stabil"))
-                sim_df["Perubahan (%)"] = sim_df.apply(
-                    lambda row: 0 if row["Bulan ke."] == 1 or (row["Jumlah Pengunjung"] - row["Selisih"]) == 0 
-                    else (row["Selisih"] / (row["Jumlah Pengunjung"] - row["Selisih"])) * 100, axis=1
-                )
-                sim_df["Perubahan (%)"] = sim_df["Perubahan (%)"].round(2)
-
-                st.subheader("📊 Hasil Simulasi")
-                st.dataframe(sim_df, use_container_width=True)
-
-                total_sim = int(round(sim_df['Jumlah Pengunjung'].sum()))
-                avg_sim = int(round(sim_df['Jumlah Pengunjung'].mean()))
-
-                st.markdown(f"**Total Pengunjung:** {total_sim:,}".replace(",", "."))
-                st.markdown(f"**Rata-rata Pengunjung:** {avg_sim:,}".replace(",", "."))
-
-                # 🔍 Analisis hasil simulasi
-                tren_counts = sim_df['Tren'].value_counts()
-                naik = tren_counts.get('Naik', 0)
-                turun = tren_counts.get('Turun', 0)
-                stabil = tren_counts.get('Stabil', 0)
-                max_val = sim_df['Jumlah Pengunjung'].max()
-                min_val = sim_df['Jumlah Pengunjung'].min()
-
-                st.subheader("📌 Wawasan untuk Pengambil Keputusan")
-                st.markdown(f"""
-                - **Rata-rata kunjungan:** {avg_sim:,} pasien per periode.
-                - **Tren dominan:** Naik ({naik} kali), Turun ({turun} kali), Stabil ({stabil} kali).
-                - **Rentang kunjungan:** {min_val:,} hingga {max_val:,} pasien.
-                - **Interpretasi:** Jika tren dominan naik, perlu persiapan kapasitas lebih besar. 
-                  Jika fluktuasi tinggi (selisih > 200), siapkan rencana darurat.
-                - **Saran:** 
-                    - Rencanakan stok obat dan tenaga medis minimal untuk {avg_sim:,} pasien.
-                    - Pertimbangkan alokasi tambahan saat prediksi mencapai {max_val:,} pasien.
-                """.replace(",", "."))
-
-                # Visualisasi
-                fig2 = px.line(sim_df, x="Bulan ke.", y="Jumlah Pengunjung", markers=True,
-                               title=f"Hasil Simulasi Monte Carlo - {selected_daerah.capitalize()}",
-                               line_shape="linear")
-                fig2.update_traces(line=dict(color='blue', width=3), marker=dict(size=8))
-                st.plotly_chart(fig2, use_container_width=True)
+        # Prediksi Manual
+        st.subheader("📝 Coba Prediksi Sentimen")
+        user_input = st.text_area("Masukkan teks review:")
+        if st.button("Prediksi"):
+            if user_input.strip():
+                user_vec = vectorizer.transform([user_input])
+                pred = model.predict(user_vec)[0]
+                st.success(f"Prediksi Sentimen: **{pred}**")
+            else:
+                st.warning("Masukkan teks untuk diprediksi.")
